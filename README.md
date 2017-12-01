@@ -5,3 +5,10 @@ Will Scrape the Headline, Summary and URL of the article. A section is provided 
 
 Comments are save to the datacase and are associated iwht their articles, users can also delete comments lest on aritcles.
 
+npm packages:
+express
+express-handlebars
+mongoose
+body-parser
+cheerio
+request
