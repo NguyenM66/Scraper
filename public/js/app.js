@@ -1,5 +1,5 @@
 //grab articles as json
-$.getJSON("/articles", function(data) {\
+$.getJSON("/", function(data) {
 	//for each article
 	for(var i=0; i < data.length; i++) {
 		//display the information to the page
@@ -51,9 +51,9 @@ $(document).on("click", "#savenote", function() {
 		url: "/articles/" + thisId,
 		data: {
 			//value from title input
-			title: $("#titleinput").val();
+			title: $("#titleinput").val(),
 			//value from body input
-			body: $("#bodyinput").val();
+			body: $("#bodyinput").val()
 		}
 	})
 	.done(function(data) {

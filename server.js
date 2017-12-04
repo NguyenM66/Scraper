@@ -2,6 +2,7 @@
 var express = require("express");
 var exphbs = require("express-handlebars");
 var bodyParser = require("body-parser");
+var logger = require("morgan");
 var mongoose = require("mongoose");
 
 //scraping tools: works on client and server
@@ -19,7 +20,7 @@ var app = express();
 //configure middleware
 
 // //use morgan logger for logging requests
-// app.use(logger("dev"));
+app.use(logger("dev"));
 
 //use body-parser for handling form submissions
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -34,7 +35,7 @@ app.use(express.static("public"));
 //set mongoose to leverage built in JavaScript ES6 Promises
 //connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect("mongodb://localhost/week18Populater", {
+mongoose.connect("mongodb://localhost/scraper", {
   useMongoClient: true
 });
 
@@ -42,9 +43,11 @@ mongoose.connect("mongodb://localhost/week18Populater", {
 //Routes
 
 app.get("/scrape", function(req, res) {
-	request.get("https://news.ycombinator.com", function(error, response, html) {
+	request("https://news.ycombinator.com", function(error, response, html) {
+		
 		if(!error && response.statusCode == 200) {
 			var $ = cheerio.load(html);
+			var result = [];
 		    $('span.comhead').each(function(i, element){
 		      var a = $(this).prev();
 		      //console.log(a.text());
@@ -63,16 +66,43 @@ app.get("/scrape", function(req, res) {
 		        points: parseInt(points),
 		        username: username,
 		        comments: parseInt(comments)
-		      };
+		      }
+		      result.push(metadata);
 		      console.log(metadata);
-		      res.render("index", metadata);
 		    })
+		    //res.json(result);
+		    //res.render("index", result);
+		    db.Article 
+		      	.create(result)
+		      	.then(function(dbArticle) {
+		      		res.send(result);
+		      		//res.json(result);
+		    		//res.render("index", result);
+		      	})
+		      	.catch(function(err) {
+		      		res.json(err);
+		      	})
 		}
 	});
 });
 
-app.get("/articles", function(req, res) {
+app.get("/", function(req,res) {
+	db.Article
+		.find({})
+		.then(function(dbArticle) {
+			res.render("index", {article: dbArticle});
+		})
+})
 
+app.get("/articles", function(req, res) {
+	// db.Article
+	// 	.find({})
+	// 	.then(function(dbArticle) {
+	// 		res.json(dbArticle);
+	// 	})
+	// 	.catch(function(err) {
+	// 		res.json(err);
+	// 	})
 })
 
 app.get("/articles/:id", function(req, res) {
