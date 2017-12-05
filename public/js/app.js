@@ -1,12 +1,30 @@
 //grab articles as json
-$.getJSON("/", function(data) {
-	//for each article
-	for(var i=0; i < data.length; i++) {
-		//display the information to the page
-		$("#articles").append("<p data-id='" +  data[i]._id + "'>" + data[i].headline + "<br>" + data[i].summary + "<br>" + data[i].url + "</p>");
-	}
-});
+// $.getJSON("/", function(data) {
+// 	//for each article
+// 	for(var i=0; i < data.length; i++) {
+// 		//display the information to the page
+// 		$("#articles").append("<p data-id='" +  data[i]._id + "'>" + data[i].headline + "<br>" + data[i].summary + "<br>" + data[i].url + "</p><button type='button' class='btn btn-primary saveBtn'>Save Article</button>");
+// 	}
+// });
 
+$(document).on("click", ".saveBtn", function() {
+	console.log("Clicked");
+	var articleId = $(this).data("id");
+	console.log(articleId);
+	var bool = $(this).data("bool");
+	console.log(bool);
+	$.ajax({
+		method: "PUT",
+		url: "/articles/" + articleId + "/" + bool
+	})
+	.done(function(data) {
+		console.log(data);
+
+		if(data.saved){
+			alert("You saved this article.");
+		}
+	})
+})
 //when the p tag is clicked
 $(document).on("click", "p", function() {
 	//empty notes from note section

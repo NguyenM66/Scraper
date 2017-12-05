@@ -75,7 +75,7 @@ app.get("/scrape", function(req, res) {
 		    db.Article 
 		      	.create(result)
 		      	.then(function(dbArticle) {
-		      		res.send(result);
+		      		res.send(dbArticle);
 		      		//res.json(result);
 		    		//res.render("index", result);
 		      	})
@@ -92,6 +92,20 @@ app.get("/", function(req,res) {
 		.then(function(dbArticle) {
 			res.render("index", {article: dbArticle});
 		})
+		.catch(function(err) {
+			res.json(err);
+		})
+})
+
+app.get("/saved", function(req, res) {
+	db.Article
+		.find({saved: true})
+		.then(function(dbArticle) {
+			res.render("saved", {article: dbArticle});
+		})
+		.catch(function(err) {
+			res.json(err);
+		})
 })
 
 app.get("/articles", function(req, res) {
@@ -105,8 +119,16 @@ app.get("/articles", function(req, res) {
 	// 	})
 })
 
-app.get("/articles/:id", function(req, res) {
-
+app.put("/articles/:id/:bool", function(req, res) {
+	db.Article
+	.findOneAndUpdate({_id: req.params.id}, {saved: req.params.bool}, {new: true})
+	.then(function(dbArticle) {
+		console.log("Saved Article");
+		res.json(dbArticle);
+	})
+	.catch(function(err) {
+		res.json(err);
+	})
 })
 
 app.post("/articles/:id", function(req, res) {
