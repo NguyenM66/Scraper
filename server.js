@@ -135,6 +135,18 @@ app.post("/articles/:id", function(req, res) {
 
 })
 
+app.delete("/articles/:id/:bool", function(req, res) {
+	db.Article
+	.findOneAndRemove({_id: req.params.id}, {save: req.params.bool}, {new:false})
+	.than(function(dbArticle) {
+		console.log("Deleted Article");
+		res.json(dbArticle);
+	})
+	.catch(function(err) {
+		res.json(err);
+	})
+})
+
 //start the server
 app.listen(PORT, function() {
 	console.log("App running on port" + PORT + "!");

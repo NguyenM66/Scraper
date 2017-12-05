@@ -1,13 +1,18 @@
-//grab articles as json
-// $.getJSON("/", function(data) {
-// 	//for each article
-// 	for(var i=0; i < data.length; i++) {
-// 		//display the information to the page
-// 		$("#articles").append("<p data-id='" +  data[i]._id + "'>" + data[i].headline + "<br>" + data[i].summary + "<br>" + data[i].url + "</p><button type='button' class='btn btn-primary saveBtn'>Save Article</button>");
-// 	}
-// });
 
-$(document).on("click", ".saveBtn", function() {
+$(document).on("click", ".scrapeNew", function(req, res) {
+	console.log("Clicked");
+	$.ajax({
+		method: "GET",
+		url: "/scrape"
+	})
+	.done(function(data) {
+		console.log(data);
+		location.reload();
+		alert("You have 30 New Articles")
+	})
+})
+
+$(document).on("click", ".saveBtn, .deleteBtn", function() {
 	console.log("Clicked");
 	var articleId = $(this).data("id");
 	console.log(articleId);
@@ -19,11 +24,19 @@ $(document).on("click", ".saveBtn", function() {
 	})
 	.done(function(data) {
 		console.log(data);
+		location.reload();
 
 		if(data.saved){
 			alert("You saved this article.");
+		}else {
+			alert("You deleted this article.")
 		}
 	})
+})
+
+$(document).on("click", ".saveNote", function(req, res) {
+	
+
 })
 //when the p tag is clicked
 $(document).on("click", "p", function() {
@@ -44,7 +57,7 @@ $(document).on("click", "p", function() {
 		//input to enter new note title
 		$("#note").append("<input id='titleinput' name='title'>");
 		//text are to add new note
-		$("#note").append("<textarea id='nodyinput' name='body'></textarea>");
+		$("#note").append("<textarea id='bodyinput' name='body'></textarea>");
 		//button to submit new note, with id or article saved to it
 		$("#note").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
 
