@@ -29,60 +29,23 @@ $(document).on("click", ".saveBtn, .deleteBtn", function() {
 		if(data.saved){
 			alert("You saved this article.");
 		}else {
-			alert("You deleted this article.")
+			alert("You deleted this article.");
 		}
 	})
 })
 
-$(document).on("click", ".saveNote", function(req, res) {
-	
-
-})
-//when the p tag is clicked
-$(document).on("click", "p", function() {
-	//empty notes from note section
-	$("#note").empty();
-	//save the id from the p tag
-	var thisId = $(this).attr("data-id");
-
-	//ajax call for the Article
-	$.ajax({
-		method: "GET",
-		url: "/articles/" + thisId
-	})
-	.done(function(data) {
-		console.log(data);
-		//headline of article
-		$("#note").append("<h2>" + data.headline + "</h2>");
-		//input to enter new note title
-		$("#note").append("<input id='titleinput' name='title'>");
-		//text are to add new note
-		$("#note").append("<textarea id='bodyinput' name='body'></textarea>");
-		//button to submit new note, with id or article saved to it
-		$("#note").append("<button data-id='" + data._id + "' id='savenote'>Save Note</button>");
-
-		//if there's a note in the article
-		if(data.note) {
-			//put title of note in titleinput
-			$("#titleinput").val(data.note.title);
-			//put body of note in body textarea
-			$("#bodyinput").val(data.note.body);
-		}
-	});
-});
 
 //when the savenote button is clicked
-$(document).on("click", "#savenote", function() {
+$(document).on("click", "#saveNote", function() {
 	//get id associated with article from submit button
-	var thisId = $(this).attr("data-id");
+	var articleId = $(this).val();
+	console.log(articleId);
 
 	//run POST to change note with what's entered in the input
 	$.ajax({
 		method: "POST",
-		url: "/articles/" + thisId,
+		url: "/article/" + articleId,
 		data: {
-			//value from title input
-			title: $("#titleinput").val(),
 			//value from body input
 			body: $("#bodyinput").val()
 		}
@@ -90,9 +53,9 @@ $(document).on("click", "#savenote", function() {
 	.done(function(data) {
 		console.log(data);
 		//empty notes section
-		$("#note").empty();
+
+		$("#notesModal").modal("hide");
 	});
 	//empty title and body for note
-	$("#titleinput").val("");
 	$("#bodyinput").val("");
 })

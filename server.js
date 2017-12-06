@@ -32,6 +32,9 @@ app.set("view engine", "handlebars");
 //use express.static to serve the public folder as a static directory
 app.use(express.static("public"));
 
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
 //set mongoose to leverage built in JavaScript ES6 Promises
 //connect to the Mongo DB
 mongoose.Promise = Promise;
@@ -97,11 +100,25 @@ app.get("/", function(req,res) {
 		})
 })
 
+
+
 app.get("/saved", function(req, res) {
 	db.Article
 		.find({saved: true})
 		.then(function(dbArticle) {
 			res.render("saved", {article: dbArticle});
+		})
+		.catch(function(err) {
+			res.json(err);
+		})
+})
+
+app.get("/article/:id", function(req, res) {
+	db.Article
+		.findOne({_id: req.params.id})
+		.populate("note")
+		.then(function(dbArticle) {
+			res.json(dbArticle);
 		})
 		.catch(function(err) {
 			res.json(err);
@@ -131,11 +148,21 @@ app.put("/articles/:id/:bool", function(req, res) {
 	})
 })
 
-app.post("/articles/:id", function(req, res) {
-
+app.post("/article/:id", function(req, res) {
+	db.Note 
+		.create(req.body)
+		.then(function(dbNote) {
+			return db.Article.findOneAndUpdate({_id: req.params.id}, {note: dbNote._id}, {new:true})
+		})
+		.then(function(dbArticle) {
+			res.json(dbArticle);
+		})
+		.catch(function(err) {
+			res.json(err);
+		})
 })
 
-app.delete("/articles/:id/:bool", function(req, res) {
+app.delete("/note/:nid/:aid", function(req, res) {
 	db.Article
 	.findOneAndRemove({_id: req.params.id}, {save: req.params.bool}, {new:false})
 	.than(function(dbArticle) {
